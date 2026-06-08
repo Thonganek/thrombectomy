@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanical Thrombectomy Registry | Roi Et Hospital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        :root {
+            --ink: #172033;
+            --muted: #64748b;
+            --line: #dbe4ef;
+            --panel: #ffffff;
+            --panel-soft: #f7fafc;
+            --brand: #0f766e;
+            --brand-strong: #115e59;
+            --blue: #2563eb;
+            --amber: #b7791f;
+            --danger: #b91c1c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background:
+                linear-gradient(180deg, #eef6f8 0%, #f7fafc 42%, #eef2f7 100%);
+            color: var(--ink);
+        }
+        .medical-gradient {
+            background: #0f766e;
+            border-bottom: 1px solid rgba(255,255,255,0.18);
+        }
+        .section-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .section-header {
+            background-color: #f8fbfc;
+            padding: 0.95rem 1.25rem;
+            border-bottom: 1px solid var(--line);
+            font-weight: 700;
+            font-size: 1rem;
+            color: #102034;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .section-header:hover { background-color: #eef7f6; }
+        .section-body { padding: 1.25rem; display: none; }
+        .section-body.active { display: block; }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.82rem; font-weight: 700; color: #42526a; margin-bottom: 0.35rem; }
+        .form-control {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.58rem 0.72rem;
+            font-size: 0.9rem;
+            background: #fff;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-control:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12); }
+        .form-control[readonly] { background-color: #f1f5f9; cursor: not-allowed; }
+        .thai-date-source {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+        }
+        .thai-date-display {
+            font-variant-numeric: tabular-nums;
+        }
+        .thai-date-display.is-invalid {
+            border-color: #e11d48;
+            box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.08);
+        }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+        .checkbox-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: #334155; }
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.96);
+            border-top: 1px solid var(--line);
+            padding: 0.9rem 1rem;
+            box-shadow: 0 -14px 36px rgba(15, 23, 42, 0.09);
+            z-index: 50;
+            backdrop-filter: blur(8px);
+        }
+        .progress-container { width: 100%; background-color: #e2e8f0; border-radius: 9999px; height: 0.5rem; margin-bottom: 0.5rem; }
+        .progress-bar { background-color: var(--brand); height: 0.5rem; border-radius: 9999px; transition: width 0.3s ease; }
+        .app-shell { max-width: 1440px; }
+        .top-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 6px;
+            padding: 0.55rem 0.75rem;
+            font-weight: 700;
+            transition: background 0.15s ease;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            border-radius: 6px;
+            padding: 0.62rem 0.9rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--brand); color: white; }
+        .btn-primary:hover { background: var(--brand-strong); }
+        .btn-secondary { background: #fff; color: #334155; border-color: var(--line); }
+        .btn-secondary:hover { background: #f8fafc; }
+        .btn-danger { background: #fff5f5; color: var(--danger); border-color: #fecaca; }
+        .btn-danger:hover { background: #fee2e2; }
+        .btn-amber { background: #fffbeb; color: var(--amber); border-color: #fde68a; }
+        button[onclick="forceSaveDraft()"],
+        button[onclick="loadDraft()"] { display: none !important; }
+        button[onclick="submitToGAS()"] {
+            background: var(--brand) !important;
+            color: white !important;
+            border: 1px solid var(--brand) !important;
+            border-radius: 6px !important;
+            box-shadow: 0 10px 22px rgba(15, 118, 110, 0.18) !important;
+        }
+        button[onclick="submitToGAS()"]:hover { background: var(--brand-strong) !important; }
+        button[onclick="clearForm()"] {
+            border-radius: 6px !important;
+            box-shadow: none !important;
+        }
+        .dashboard-panel {
+            background: rgba(255,255,255,0.94);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+        }
+        .metric-card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 104px;
+        }
+        #dashboardView > .grid:first-child > div {
+            background: white !important;
+            border: 1px solid var(--line) !important;
+            border-left: 4px solid var(--brand) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06) !important;
+        }
+        .metric-label { color: var(--muted); font-size: 0.82rem; font-weight: 700; }
+        .metric-value { color: #102034; font-size: 1.75rem; line-height: 1.1; font-weight: 800; margin-top: 0.35rem; }
+        .metric-sub { color: var(--muted); font-size: 0.76rem; margin-top: 0.25rem; }
+        .data-table-wrap {
+            overflow: auto;
+            max-height: 62vh;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: white;
+        }
+        .data-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.82rem; }
+        .data-table th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #f8fbfc;
+            color: #334155;
+            font-weight: 800;
+            border-bottom: 1px solid var(--line);
+            padding: 0.7rem 0.75rem;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .data-table td {
+            border-bottom: 1px solid #eef2f7;
+            padding: 0.62rem 0.75rem;
+            color: #334155;
+            max-width: 260px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .data-table tbody tr:hover { background: #f6fbfb; }
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 3;
+            background: inherit;
+            box-shadow: 1px 0 0 var(--line);
+        }
+        .data-table th.sticky-col { background: #f8fbfc; z-index: 4; }
+        .empty-state {
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-weight: 700;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+        .workspace-hero {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.07);
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+        }
+        .workspace-hero-main {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 1.5rem;
+            align-items: center;
+            padding: 1.25rem 1.35rem;
+            background:
+                linear-gradient(90deg, rgba(15, 118, 110, 0.08), rgba(37, 99, 235, 0.04)),
+                #ffffff;
+        }
+        .workspace-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            color: var(--brand-strong);
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            margin-bottom: 0.45rem;
+        }
+        .workspace-title {
+            color: #102034;
+            font-size: clamp(1.35rem, 2vw, 2rem);
+            line-height: 1.2;
+            font-weight: 800;
+            margin: 0;
+        }
+        .workspace-subtitle {
+            color: var(--muted);
+            margin-top: 0.35rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .workspace-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.6rem;
+        }
+        .workspace-meta {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            border-top: 1px solid var(--line);
+            background: #fbfdfe;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            min-height: 74px;
+            padding: 0.9rem 1.25rem;
+            border-right: 1px solid var(--line);
+        }
+        .meta-item:last-child { border-right: 0; }
+        .meta-icon {
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #e8f5f3;
+            color: var(--brand-strong);
+            flex: 0 0 auto;
+        }
+        .meta-label {
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+        .meta-value {
+            color: #172033;
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-top: 0.1rem;
+        }
+        .form-command-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.72);
+        }
+        .section-card:first-of-type {
+            border-color: rgba(15, 118, 110, 0.28);
+            box-shadow: 0 18px 42px rgba(15, 118, 110, 0.08);
+        }
+        .section-card:first-of-type .section-header {
+            background: #eef8f6;
+            color: #0f3f3b;
+        }
+        .required-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #9f1239;
+            background: #fff1f2;
+            border: 1px solid #ffe4e6;
+            border-radius: 999px;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+        @media (max-width: 980px) {
+            .workspace-hero-main {
+                grid-template-columns: 1fr;
+            }
+            .workspace-actions {
+                justify-content: flex-start;
+            }
+            .workspace-meta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .meta-item:nth-child(2) { border-right: 0; }
+            .meta-item:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+        }
+        @media (max-width: 640px) {
+            .workspace-hero-main {
+                padding: 1rem;
+            }
+            .workspace-actions,
+            .form-command-strip {
+                align-items: stretch;
+                flex-direction: column;
+            }
+            .workspace-actions .btn,
+            .form-command-strip .btn {
+                width: 100%;
+            }
+            .workspace-meta {
+                grid-template-columns: 1fr;
+            }
+            .meta-item {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+            .meta-item:last-child { border-bottom: 0; }
+        }
+        /* NIHSS Table specific */
+        .nihss-table th, .nihss-table td { padding: 0.5rem; border: 1px solid #e2e8f0; font-size: 0.875rem; }
+        .nihss-table th { background-color: #f8fafc; }
+        
+        /* Loading Overlay */
+        #loadingOverlay { display: none; position: fixed; inset: 0; background: rgba(248,250,252,0.82); z-index: 100; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(3px); }
+        .spinner { border: 4px solid #e2e8f0; border-top: 4px solid var(--brand); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="pb-32">
+
+    <!-- Navbar -->
+    <nav class="medical-gradient text-white shadow-md sticky top-0 z-40">
+        <div class="app-shell mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-staff-snake text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold leading-tight">Thrombectomy Registry</h1>
+                        <p class="text-xs text-sky-100">Roi Et Hospital Clinical Data System</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 text-sm">
+                    <span id="syncStatus" class="bg-teal-900/60 px-3 py-1 rounded-full"><i class="fa-solid fa-cloud text-emerald-300 mr-1"></i> Ready</span>
+                    <button onclick="toggleView()" id="viewToggleBtn" class="top-action hover:bg-teal-800"><i class="fa-solid fa-table-columns"></i> Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner mb-4"></div>
+        <div class="text-lg font-semibold text-gray-700" id="loadingText">กำลังประมวลผล...</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="app-shell mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Dashboard View (Initially Hidden) -->
+        <div id="dashboardView" style="display: none;">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                    <h3 class="text-gray-500 text-sm">Total Records</h3>
+                    <p class="text-2xl font-bold text-gray-800" id="statTotal">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                    <h3 class="text-gray-500 text-sm">Successful Reperfusion</h3>
+                    <p class="text-2xl font-bold text-gray-800" id="statSuccessReperf">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow border-l-4 border-teal-500">
+                    <h3 class="text-gray-500 text-sm">Functional Indep. (mRS 0-2)</h3>
+                    <p class="text-2xl font-bold text-gray-800" id="statGoodOut">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
+                    <h3 class="text-gray-500 text-sm">Mortality</h3>
+                    <p class="text-2xl font-bold text-gray-800" id="statDeath">0</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="flex gap-2">
+                    <input type="text" id="searchInput" class="form-control flex-1" placeholder="ค้นหาด้วย Study ID...">
+                    <button onclick="searchData()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"><i class="fa-solid fa-search"></i> ค้นหา</button>
+                    <button onclick="exportCSV()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"><i class="fa-solid fa-download"></i> Export CSV</button>
+                </div>
+            </div>
+            <div class="dashboard-panel p-4 mb-6">
+                <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] gap-3 items-center mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Dashboard</h2>
+                        <p class="text-sm text-slate-500" id="dashboardRecordCount">0 records</p>
+                    </div>
+                    <button type="button" onclick="startNewRecord()" class="btn btn-secondary"><i class="fa-solid fa-file-circle-plus"></i> เพิ่มข้อมูลใหม่</button>
+                    <button type="button" onclick="fetchDashboardData()" class="btn btn-secondary"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </div>
+                <div id="dashboardSummaryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-4"></div>
+                <div id="dashboardVariableSummaryContainer" class="mb-4"></div>
+                <div id="dashboardTableContainer" class="empty-state">ยังไม่มีข้อมูลสำหรับแสดงผล</div>
+            </div>
+        </div>
+
+        <!-- Form View -->
+        <div id="formView">
+            <section class="workspace-hero">
+                <div class="workspace-hero-main">
+                    <div>
+                        <div class="workspace-eyebrow"><i class="fa-solid fa-notes-medical"></i> Clinical Registry Workspace</div>
+                        <h2 class="workspace-title">Mechanical Thrombectomy Case Entry</h2>
+                        <div class="workspace-subtitle">Roi Et Hospital Stroke Service</div>
+                    </div>
+                    <div class="workspace-actions">
+                        <button type="button" onclick="toggleView()" class="btn btn-secondary"><i class="fa-solid fa-table-columns"></i> Dashboard</button>
+                        <button type="button" onclick="startNewRecord()" class="btn btn-secondary"><i class="fa-solid fa-file-circle-plus"></i> เพิ่มข้อมูลใหม่</button>
+                        <button type="button" onclick="submitToGAS()" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูล</button>
+                    </div>
+                </div>
+                <div class="workspace-meta">
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                        <div>
+                            <div class="meta-label">Primary Key</div>
+                            <div class="meta-value">Study ID</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                        <div>
+                            <div class="meta-label">Record Status</div>
+                            <div class="meta-value" id="heroRecordStatus">Draft</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div>
+                            <div class="meta-label">Form Completion</div>
+                            <div class="meta-value" id="heroCompletion">0%</div>
+                        </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <div>
+                            <div class="meta-label">Data Destination</div>
+                            <div class="meta-value">Google Sheet</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-command-strip">
+                <span class="required-pill"><i class="fa-solid fa-circle-exclamation"></i> ฟิลด์จำเป็น: Study ID, Data Component, Sex, Age</span>
+                <span class="text-sm font-bold text-slate-500" id="heroLastSaved">พร้อมบันทึกข้อมูล</span>
+            </div>
+
+            <form id="registryForm">
+                
+                <!-- Section 0 -->
+                <div class="section-card">
+                    <div class="section-header" onclick="toggleSection('sec0')">
+                        <span><i class="fa-solid fa-file-medical mr-2"></i> Section 0: ข้อมูลการบันทึก (Administrative Data)</span>
+                        <i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec0"></i>
+                    </div>
+                    <div class="section-body active" id="sec0">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="form-group">
+                                <label class="form-label text-red-600">0.1 Study ID *</label>
+                                <input type="text" name="study_id" class="form-control font-bold" required oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label text-red-600">0.2 Data Component *</label>
+                                <select name="data_component" class="form-control" required onchange="updateDraft()">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="Retrospective">Retrospective</option>
+                                    <option value="Prospective">Prospective</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">0.3 HN Linkage Key</label>
+                                <input type="text" name="hn_linkage_key" class="form-control" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">0.4 ผู้บันทึกข้อมูล</label>
+                                <input type="text" name="recorder_name" class="form-control" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">0.5 วันที่บันทึก</label>
+                                <input type="date" name="record_date" class="form-control" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">0.6 สถานะข้อมูล</label>
+                                <select name="record_status" class="form-control" readonly>
+                                    <option value="Draft" selected>Draft</option>
+                                    <option value="Submitted">Submitted</option>
+                                    <option value="Verified">Verified</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="created_at" id="created_at">
+                            <input type="hidden" name="updated_at" id="updated_at">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1 -->
+                <div class="section-card">
+                    <div class="section-header" onclick="toggleSection('sec1')">
+                        <span><i class="fa-solid fa-user-injured mr-2"></i> Section 1: ข้อมูลทั่วไปและประวัติทางการแพทย์</span>
+                        <i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec1"></i>
+                    </div>
+                    <div class="section-body" id="sec1">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">1.2 เพศ *</label>
+                                <select name="sex" class="form-control" required onchange="updateDraft()">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="1">1 = ชาย</option>
+                                    <option value="2">2 = หญิง</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.3 อายุ (ปี) *</label>
+                                <input type="number" name="age_at_stroke_years" class="form-control" required min="0" max="120" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.4 น้ำหนัก (กก.)</label>
+                                <input type="number" step="0.1" name="weight_kg" id="weight_kg" class="form-control" oninput="calcBMI()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.5 ส่วนสูง (ซม.)</label>
+                                <input type="number" step="0.1" name="height_cm" id="height_cm" class="form-control" oninput="calcBMI()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.6 BMI (คำนวณอัตโนมัติ)</label>
+                                <input type="text" name="bmi_kg_m2" id="bmi_kg_m2" class="form-control bg-gray-100 text-blue-700 font-bold" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.7 ภูมิลำเนา (อำเภอ)</label>
+                                <input type="text" name="domicile_district" class="form-control" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.7 ภูมิลำเนา (จังหวัด)</label>
+                                <input type="text" name="domicile_province" class="form-control" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.8 ระยะทางถึง รพ.ร้อยเอ็ด (กม.)</label>
+                                <input type="number" name="distance_to_roi_et_hospital_km" class="form-control" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group md:col-span-2">
+                                <label class="form-label">1.9 สิทธิการรักษา</label>
+                                <select name="health_insurance" class="form-control" onchange="toggleOtherText(this, 'health_insurance_other_text', 'Other')">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="UCS">UCS บัตรทอง</option>
+                                    <option value="Social security">Social security ประกันสังคม</option>
+                                    <option value="Civil servant">Civil servant ข้าราชการ/รัฐวิสาหกิจ</option>
+                                    <option value="Self-pay">Self-pay ชำระเงินเอง</option>
+                                    <option value="Other">อื่น ๆ</option>
+                                </select>
+                                <input type="text" name="health_insurance_other_text" id="health_insurance_other_text" class="form-control mt-2 hidden" placeholder="ระบุสิทธิการรักษาอื่น ๆ" oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.10 Premorbid mRS</label>
+                                <select name="premorbid_mrs" class="form-control" onchange="updateDraft()">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 border-t pt-4">
+                            <label class="form-label font-semibold">1.11 โรคประจำตัว (เลือกได้มากกว่า 1)</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="hypertension" onchange="updateDraft()"> Hypertension</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="diabetes_mellitus" onchange="updateDraft()"> Diabetes Mellitus</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="dyslipidemia" onchange="updateDraft()"> Dyslipidemia</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="atrial_fibrillation" onchange="updateDraft()"> Atrial Fibrillation</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="coronary_artery_disease" onchange="updateDraft()"> Coronary Artery Disease</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="prior_stroke_tia" onchange="updateDraft()"> Prior Stroke/TIA</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="chronic_kidney_disease" onchange="updateDraft()"> Chronic Kidney Disease</label>
+                                <label class="checkbox-item"><input type="checkbox" name="comorbidities" value="no_comorbidity" onchange="updateDraft()"> No comorbidity (ไม่มี)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 border-t pt-4">
+                            <div class="form-group">
+                                <label class="form-label">1.11 สถานะการสูบบุหรี่</label>
+                                <select name="smoking_status" class="form-control" onchange="updateDraft()">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="current_smoker">Current smoker</option>
+                                    <option value="ex_smoker">Ex-smoker</option>
+                                    <option value="never_smoker">Never smoker</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.12 Pre-stroke Antiplatelet</label>
+                                <select name="pre_stroke_antiplatelet" class="form-control" onchange="updateDraft()">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="none">None</option>
+                                    <option value="asa">ASA</option>
+                                    <option value="clopidogrel">Clopidogrel</option>
+                                    <option value="dapt">DAPT</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.12 Pre-stroke Anticoagulant</label>
+                                <select name="pre_stroke_anticoagulant" class="form-control" onchange="toggleDOACWarfarin(this)">
+                                    <option value="">-- เลือก --</option>
+                                    <option value="none">None</option>
+                                    <option value="warfarin">Warfarin</option>
+                                    <option value="doac">DOAC</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.12 Latest INR (ถ้าได้ Warfarin)</label>
+                                <input type="number" step="0.01" name="latest_inr_if_warfarin" id="latest_inr_if_warfarin" class="form-control" disabled oninput="updateDraft()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">1.12 DOAC Name (ถ้าได้ DOAC)</label>
+                                <input type="text" name="doac_name" id="doac_name" class="form-control" disabled oninput="updateDraft()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Clinical Data -->
+                <div class="section-card">
+                    <div class="section-header" onclick="toggleSection('sec2')">
+                        <span><i class="fa-solid fa-stethoscope mr-2"></i> Section 2: ลักษณะทางคลินิกแรกรับและความรุนแรงของโรค</span>
+                        <i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec2"></i>
+                    </div>
+                    <div class="section-body" id="sec2">
+                        <!-- Content omitted for brevity in thought process, but WILL BE FULLY RENDERED IN FINAL HTML -->
+                    </div>
+                </div>
+
+                <!-- The full HTML generation logic is too vast for simple string writing in thoughts. I will construct the complete structure directly in the code block below. -->
+                
+            </form>
+        </div>
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <div class="sticky-footer">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between items-center text-sm mb-2">
+                <span class="text-gray-500" id="progressText">ความสมบูรณ์ 0%</span>
+                <span class="text-gray-400 text-xs" id="lastSavedText">Auto-save: Not yet</span>
+            </div>
+            <div class="flex flex-wrap gap-2 justify-end">
+                <button type="button" onclick="clearForm()" class="px-4 py-2 bg-red-100 text-red-600 rounded hover:bg-red-200 border border-red-300 font-medium">ล้างข้อมูล</button>
+                <button type="button" onclick="loadDraft()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 border border-gray-300 font-medium">โหลดแบบร่าง</button>
+                <button type="button" onclick="forceSaveDraft()" class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 border border-yellow-300 font-medium"><i class="fa-solid fa-floppy-disk mr-1"></i> บันทึก Draft (Local)</button>
+                <button type="button" onclick="submitToGAS()" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold shadow"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. Configuration & Global Variables
+        // ==========================================
+        // *** ให้นำ URL ของ Web App จาก Google Apps Script มาวางที่นี่ ***
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzWFvzyOWrRRfmFxvTl98TiU9a88mi_hp_1_kRChl9oqFuOcOyjJTU9xx72npwVpqNz2A/exec"; 
+        const DRAFT_KEY = 'thrombectomy_draft_data';
+        
+        // ==========================================
+        // 2. Form Rendering & HTML Construction Generation 
+        // (Due to the massive amount of variables, the HTML is generated dynamically to keep the file clean but completely functional and avoiding omissions)
+        // ==========================================
+        
+        const formStructure = {
+            sec2: `
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="form-group"><label class="form-label">2.1 LKW Date</label><input type="date" name="lkw_date" class="form-control" onchange="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.1 LKW Time</label><input type="time" name="lkw_time" class="form-control" onchange="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.2 Symptom Onset Type</label>
+                        <select name="symptom_onset_type" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option>
+                            <option value="witnessed_clear_time">Witnessed / Clear time</option>
+                            <option value="wake_up_stroke">Wake up stroke</option>
+                            <option value="unknown_onset">Unknown onset</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">2.2 Witnessed Onset Time</label><input type="time" name="witnessed_onset_time" class="form-control" onchange="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">2.3 Initial BP Systolic (mmHg)</label><input type="number" name="initial_bp_systolic" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.3 Initial BP Diastolic (mmHg)</label><input type="number" name="initial_bp_diastolic" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.3 Initial HR (/min)</label><input type="number" name="initial_hr_per_min" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.3 Initial RR (/min)</label><input type="number" name="initial_rr_per_min" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.3 Initial Temp (°C)</label><input type="number" step="0.1" name="initial_temp_c" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.3 Initial SpO2 (%)</label><input type="number" name="initial_spo2_percent" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.4 POC Glucose (mg/dL)</label><input type="number" name="poc_glucose_mg_dl" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">2.5 Baseline NIHSS Total</label><input type="number" name="baseline_nihss_total" id="baseline_nihss_total_main" class="form-control bg-blue-50" readonly placeholder="Auto from Appx A"></div>
+                    
+                    <div class="form-group"><label class="form-label">2.6 GCS Eye (1-4)</label><input type="number" name="gcs_eye" id="gcs_eye" class="form-control" min="1" max="4" oninput="calcGCS()"></div>
+                    <div class="form-group"><label class="form-label">2.6 GCS Verbal (1-5)</label><input type="number" name="gcs_verbal" id="gcs_verbal" class="form-control" min="1" max="5" oninput="calcGCS()"></div>
+                    <div class="form-group"><label class="form-label">2.6 GCS Motor (1-6)</label><input type="number" name="gcs_motor" id="gcs_motor" class="form-control" min="1" max="6" oninput="calcGCS()"></div>
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">2.6 GCS Total</label><input type="number" name="gcs_total" id="gcs_total" class="form-control bg-blue-50" readonly></div>
+                    
+                    <div class="form-group"><label class="form-label">2.7 Hb (g/dL)</label><input type="number" step="0.1" name="hb_g_dl" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.7 Hct (%)</label><input type="number" step="0.1" name="hct_percent" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.7 WBC (/uL)</label><input type="number" name="wbc_per_ul" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.7 Platelet (x10^3/uL)</label><input type="number" name="platelet_x10_3_ul" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.8 INR</label><input type="number" step="0.01" name="inr" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.8 aPTT (seconds)</label><input type="number" step="0.1" name="aptt_seconds" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.9 Creatinine (mg/dL)</label><input type="number" step="0.01" name="creatinine_mg_dl" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.9 eGFR</label><input type="number" step="0.1" name="egfr_ml_min_1_73m2" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">2.10 HbA1C (%)</label><input type="number" step="0.1" name="hba1c_percent" class="form-control" oninput="updateDraft()"></div>
+                </div>
+            `,
+            sec3: `
+                <div class="form-group mb-4">
+                    <label class="form-label font-semibold">3.1 Imaging Modality (เลือกได้มากกว่า 1)</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" name="imaging_modality" value="ncct" onchange="updateDraft()"> NCCT</label>
+                        <label class="checkbox-item"><input type="checkbox" name="imaging_modality" value="cta" onchange="updateDraft()"> CTA</label>
+                        <label class="checkbox-item"><input type="checkbox" name="imaging_modality" value="ct_perfusion" onchange="updateDraft()"> CT Perfusion</label>
+                        <label class="checkbox-item"><input type="checkbox" name="imaging_modality" value="mri_mra" onchange="updateDraft()"> MRI/MRA</label>
+                        <label class="checkbox-item"><input type="checkbox" name="imaging_modality" value="dsa" onchange="updateDraft()"> DSA</label>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">3.2 ASPECTS Score</label><input type="number" name="aspects_score" id="aspects_score_main" class="form-control bg-blue-50" readonly placeholder="Auto from Appx B"></div>
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">3.2 pc-ASPECTS Score</label><input type="number" name="pc_aspects_score" id="pc_aspects_score_main" class="form-control bg-blue-50" readonly placeholder="Auto from Appx B"></div>
+                    <div class="form-group"><label class="form-label">3.3 Main Occlusion Site</label>
+                        <select name="main_occlusion_site" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option>
+                            <option value="ica">ICA</option><option value="ica_terminus">ICA terminus</option>
+                            <option value="m1">M1</option><option value="m2">M2</option><option value="a1">A1</option>
+                            <option value="basilar_artery">Basilar Artery</option><option value="vertebral_v4">Vertebral V4</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">3.4 Lesion Side</label>
+                        <select name="lesion_side" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="left">Left</option><option value="right">Right</option><option value="posterior_midline">Posterior/Midline</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">3.5 Collateral Status</label>
+                        <select name="collateral_status" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="good">Good</option><option value="moderate">Moderate</option><option value="poor">Poor</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">3.5 ASITN/SIR Grade</label><input type="text" name="asitn_sir_grade" id="asitn_sir_grade_main" class="form-control bg-blue-50" readonly placeholder="Auto from Appx H"></div>
+                    
+                    <div class="form-group"><label class="form-label">3.6 Infarct Core Volume (mL)</label><input type="number" step="0.1" name="infarct_core_volume_ml" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group mt-6"><label class="checkbox-item text-red-500"><input type="checkbox" name="infarct_core_not_assessed" value="yes" onchange="updateDraft()"> ไม่ได้ประเมิน</label></div>
+                    
+                    <div class="form-group"><label class="form-label">3.7 Penumbra Volume (mL)</label><input type="number" step="0.1" name="penumbra_volume_ml" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group mt-6"><label class="checkbox-item text-red-500"><input type="checkbox" name="penumbra_not_assessed" value="yes" onchange="updateDraft()"> ไม่ได้ประเมิน</label></div>
+                    
+                    <div class="form-group"><label class="form-label">3.8 Mismatch Ratio</label><input type="number" step="0.1" name="mismatch_ratio" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group mt-6"><label class="checkbox-item text-red-500"><input type="checkbox" name="mismatch_not_assessed" value="yes" onchange="updateDraft()"> ไม่ได้ประเมิน</label></div>
+                    
+                    <div class="form-group"><label class="form-label">3.9 Tandem Occlusion</label>
+                        <select name="tandem_occlusion" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">3.9 Tandem Extracranial Location</label><input type="text" name="tandem_extracranial_location" class="form-control" oninput="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">3.10 Hyperdense Vessel Sign</label>
+                        <select name="hyperdense_vessel_sign" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">3.10 Clot Length (mm)</label><input type="number" step="0.1" name="clot_length_mm" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group mt-6"><label class="checkbox-item text-red-500"><input type="checkbox" name="clot_length_not_measured" value="yes" onchange="updateDraft()"> ไม่ได้วัด</label></div>
+                </div>
+            `,
+            sec4: `
+                <div class="bg-blue-50 p-3 rounded mb-4 text-sm"><i class="fa-solid fa-info-circle"></i> ระบบจะคำนวณระยะเวลา (นาที) ให้อัตโนมัติเมื่อกรอกวันที่และเวลาครบถ้วน</div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 border-b pb-4">
+                    <div class="col-span-1 md:col-span-4 font-bold text-lg text-sky-800">4A Timestamp (กรุณาระบุ Date และ Time)</div>
+                    <div class="form-group"><label class="form-label">LKW Date</label><input type="date" id="wf_lkw_d" name="lkw_timestamp_date" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    <div class="form-group"><label class="form-label">LKW Time</label><input type="time" id="wf_lkw_t" name="lkw_timestamp_time" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Ref. Hosp Arrival Date</label><input type="date" name="referring_hospital_arrival_date" class="form-control" onchange="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">Ref. Hosp Arrival Time</label><input type="time" name="referring_hospital_arrival_time" class="form-control" onchange="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Ref. Hosp Depart Date</label><input type="date" name="referring_hospital_departure_date" class="form-control" onchange="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">Ref. Hosp Depart Time</label><input type="time" name="referring_hospital_departure_time" class="form-control" onchange="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Roi Et Door Date</label><input type="date" id="wf_door_d" name="roi_et_door_date" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    <div class="form-group"><label class="form-label">Roi Et Door Time</label><input type="time" id="wf_door_t" name="roi_et_door_time" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Imaging Start Date</label><input type="date" id="wf_img_d" name="imaging_start_date" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    <div class="form-group"><label class="form-label">Imaging Start Time</label><input type="time" id="wf_img_t" name="imaging_start_time" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Needle Start Date</label><input type="date" id="wf_ndl_d" name="needle_start_date" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    <div class="form-group"><label class="form-label">Needle Start Time</label><input type="time" id="wf_ndl_t" name="needle_start_time" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    
+                    <div class="form-group"><label class="form-label text-red-600">Puncture Date</label><input type="date" id="wf_punc_d" name="puncture_date" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    <div class="form-group"><label class="form-label text-red-600">Puncture Time</label><input type="time" id="wf_punc_t" name="puncture_time" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    
+                    <div class="form-group"><label class="form-label text-red-600">Reperfusion/End Date</label><input type="date" id="wf_rep_d" name="reperfusion_or_end_procedure_date" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                    <div class="form-group"><label class="form-label text-red-600">Reperfusion/End Time</label><input type="time" id="wf_rep_t" name="reperfusion_or_end_procedure_time" class="form-control wf-calc" onchange="calcWorkflow()"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 border-b pb-4 bg-green-50 p-4 rounded border border-green-200">
+                    <div class="col-span-1 md:col-span-3 font-bold text-lg text-green-800">4B Calculated Metrics (นาที)</div>
+                    <div class="form-group"><label class="form-label">4.1 Onset to Door</label><input type="number" id="c_otd" name="onset_to_door_minutes" class="form-control font-bold" readonly></div>
+                    <div class="form-group"><label class="form-label">4.2 Door to Imaging</label><input type="number" id="c_dti" name="door_to_imaging_minutes" class="form-control font-bold" readonly></div>
+                    <div class="form-group"><label class="form-label">4.3 Door to Needle</label><input type="number" id="c_dtn" name="door_to_needle_minutes" class="form-control font-bold" readonly></div>
+                    <div class="form-group"><label class="form-label">4.4 Door to Puncture</label><input type="number" id="c_dtp" name="door_to_puncture_minutes" class="form-control font-bold" readonly></div>
+                    <div class="form-group"><label class="form-label">4.5 Puncture to Reperfusion</label><input type="number" id="c_ptr" name="puncture_to_reperfusion_minutes" class="form-control font-bold text-red-600" readonly></div>
+                    <div class="form-group"><label class="form-label">4.6 Onset to Reperfusion</label><input type="number" id="c_otr" name="onset_to_reperfusion_minutes" class="form-control font-bold text-red-600" readonly></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="col-span-1 md:col-span-3 font-bold text-lg text-sky-800">4C System Metrics</div>
+                    <div class="form-group"><label class="form-label">4.7 Mode of Arrival</label>
+                        <select name="mode_of_arrival" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option>
+                            <option value="walk_in">Walk-in</option><option value="ems_1669">EMS 1669</option>
+                            <option value="drip_and_ship">Drip and Ship</option><option value="mothership_refer_no_ivt">Mothership (Refer without IVT)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">4.8 Arrival Period</label>
+                        <select name="arrival_period" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="official_hours">Official hours (เวลาราชการ)</option><option value="after_hours_or_holiday">After hours or Holiday (นอกเวลา)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">4.9 Stroke Fast Track Activation</label>
+                        <select name="stroke_fast_track_activation" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">4.9 Fast Track Activation Time</label><input type="time" name="stroke_fast_track_activation_time" class="form-control" onchange="updateDraft()"></div>
+                </div>
+            `,
+            sec5: `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group"><label class="form-label">5.1 IV Thrombolysis ก่อน MT</label>
+                        <select name="iv_thrombolysis_before_mt" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="no">No</option><option value="yes">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">5.1 Thrombolytic Agent</label>
+                        <select name="thrombolytic_agent" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="alteplase_0_9_mg_kg">Alteplase (0.9 mg/kg)</option><option value="tenecteplase_0_25_mg_kg">Tenecteplase (0.25 mg/kg)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">5.1 Total Dose (mg)</label><input type="number" step="0.1" name="thrombolytic_total_dose_mg" class="form-control" oninput="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">5.2 Anesthesia Type</label>
+                        <select name="anesthesia_type" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="general_anesthesia">General Anesthesia</option><option value="conscious_sedation">Conscious Sedation</option><option value="local_anesthesia_only">Local Anesthesia Only</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">5.3 Vascular Access Site</label>
+                        <select name="vascular_access_site" class="form-control" onchange="toggleOtherText(this, 'vascular_access_other_text', 'other')">
+                            <option value="">-- เลือก --</option><option value="femoral">Femoral</option><option value="radial">Radial</option><option value="other">Other</option>
+                        </select>
+                        <input type="text" name="vascular_access_other_text" id="vascular_access_other_text" class="form-control mt-2 hidden" placeholder="ระบุ site อื่นๆ" oninput="updateDraft()">
+                    </div>
+                    <div class="form-group"><label class="form-label">5.4 First Line Technique</label>
+                        <select name="first_line_technique" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="stent_retriever">Stent Retriever</option><option value="aspiration_adapt">Aspiration (ADAPT)</option><option value="combined_solumbra">Combined (Solumbra)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">5.4 Device Name</label><input type="text" name="device_name" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">5.5 Number of Passes</label><input type="number" name="number_of_passes" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">5.6 First Pass Effect (FPE)</label>
+                        <select name="first_pass_effect" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="mfpe_mtici_2b_3_after_1_pass">mFPE (mTICI 2b-3 after 1 pass)</option><option value="tfpe_mtici_3_after_1_pass">tFPE (mTICI 3 after 1 pass)</option><option value="no_fpe">No FPE</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group md:col-span-3 border-t pt-4"><label class="form-label font-semibold">5.7 Rescue Therapy (เลือกได้มากกว่า 1)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" name="rescue_therapy" value="none" onchange="updateDraft()"> None</label>
+                            <label class="checkbox-item"><input type="checkbox" name="rescue_therapy" value="angioplasty" onchange="updateDraft()"> Angioplasty</label>
+                            <label class="checkbox-item"><input type="checkbox" name="rescue_therapy" value="stenting" onchange="updateDraft()"> Stenting</label>
+                            <label class="checkbox-item"><input type="checkbox" name="rescue_therapy" value="intra_arterial_thrombolytic" onchange="updateDraft()"> Intra-arterial thrombolytic</label>
+                            <label class="checkbox-item"><input type="checkbox" name="rescue_therapy" value="other" onchange="document.getElementById('rescue_therapy_other_text').classList.toggle('hidden', !this.checked); updateDraft();"> Other</label>
+                        </div>
+                        <input type="text" name="rescue_therapy_other_text" id="rescue_therapy_other_text" class="form-control mt-2 hidden w-1/3" placeholder="ระบุ rescue therapy อื่นๆ" oninput="updateDraft()">
+                    </div>
+
+                    <div class="form-group md:col-span-3 border-t pt-4"><label class="form-label font-semibold text-red-600">5.8 Procedural Complications (เลือกได้มากกว่า 1)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="none" onchange="updateDraft()"> None</label>
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="vessel_perforation" onchange="updateDraft()"> Vessel Perforation</label>
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="dissection" onchange="updateDraft()"> Dissection</label>
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="embolization_to_new_territory" onchange="updateDraft()"> Embolization to New Territory (ENT)</label>
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="vasospasm" onchange="updateDraft()"> Vasospasm</label>
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="access_site_complication" onchange="updateDraft()"> Access site complication</label>
+                            <label class="checkbox-item"><input type="checkbox" name="procedural_complications" value="other" onchange="document.getElementById('procedural_complications_other_text').classList.toggle('hidden', !this.checked); updateDraft();"> Other</label>
+                        </div>
+                        <input type="text" name="procedural_complications_other_text" id="procedural_complications_other_text" class="form-control mt-2 hidden w-1/3" placeholder="ระบุ complication อื่นๆ" oninput="updateDraft()">
+                    </div>
+                </div>
+            `,
+            sec6: `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="col-span-1 md:col-span-3 font-bold text-lg text-sky-800">6A Procedural Outcomes</div>
+                    <div class="form-group"><label class="form-label">6.1 mTICI Score</label>
+                        <select name="mtici_score" id="mtici_score_main" class="form-control" onchange="calcTICI()">
+                            <option value="">-- เลือก --</option><option value="0">0</option><option value="1">1</option><option value="2a">2a</option><option value="2b">2b</option><option value="2c">2c</option><option value="3">3</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">6.2 Successful Reperfusion (mTICI ≥ 2b)</label><input type="text" id="succ_reperf" name="successful_reperfusion_mtici_2b_or_more" class="form-control bg-green-50 font-bold" readonly></div>
+                    <div class="form-group"><label class="form-label">6.3 Excellent Reperfusion (mTICI 2c-3)</label><input type="text" id="excel_reperf" name="excellent_reperfusion_mtici_2c_or_3" class="form-control bg-green-50 font-bold" readonly></div>
+                    
+                    <div class="col-span-1 md:col-span-3 font-bold text-lg text-sky-800 border-t pt-4">6B Early Neurological Outcomes</div>
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">6.4 NIHSS 24h Total</label><input type="number" name="nihss_24h_total" id="nihss_24h_total_main" class="form-control bg-blue-50" readonly placeholder="Auto from Appx A"></div>
+                    <div class="form-group"><label class="form-label">6.5 Dramatic Early Improvement (NIHSS ลด ≥8 หรือ =0,1)</label>
+                        <select name="dramatic_early_improvement" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label text-red-600">6.6 Early Neurological Deterioration (NIHSS เพิ่ม ≥4)</label>
+                        <select name="early_neurological_deterioration" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-1 md:col-span-3 font-bold text-lg text-sky-800 border-t pt-4">6C Safety Outcomes</div>
+                    <div class="form-group"><label class="form-label text-red-600">6.7 sICH (ECASS II criteria)</label>
+                        <select name="sich_ecass_ii" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label text-red-600">6.8 Heidelberg Bleeding Class</label><input type="text" name="heidelberg_bleeding_class" id="heidelberg_main" class="form-control bg-blue-50" readonly placeholder="Auto from Appx G"></div>
+                    <div class="form-group"><label class="form-label">6.9 Asymptomatic ICH</label>
+                        <select name="asymptomatic_ich" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">6.10 Cerebral Edema / Malignant Infarction</label>
+                        <select name="cerebral_edema_malignant_infarction" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">6.10 Decompressive Craniectomy</label>
+                        <select name="decompressive_craniectomy" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group md:col-span-3"><label class="form-label font-semibold">6.11 Systemic Complications (เลือกได้มากกว่า 1)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" name="systemic_complications" value="none" onchange="updateDraft()"> None</label>
+                            <label class="checkbox-item"><input type="checkbox" name="systemic_complications" value="pneumonia" onchange="updateDraft()"> Pneumonia</label>
+                            <label class="checkbox-item"><input type="checkbox" name="systemic_complications" value="uti" onchange="updateDraft()"> UTI</label>
+                            <label class="checkbox-item"><input type="checkbox" name="systemic_complications" value="dvt_pe" onchange="updateDraft()"> DVT/PE</label>
+                            <label class="checkbox-item"><input type="checkbox" name="systemic_complications" value="other" onchange="document.getElementById('sys_comp_other').classList.toggle('hidden', !this.checked); updateDraft();"> Other</label>
+                        </div>
+                        <input type="text" name="systemic_complications_other_text" id="sys_comp_other" class="form-control mt-2 hidden w-1/3" placeholder="ระบุ systemic complication อื่นๆ" oninput="updateDraft()">
+                    </div>
+
+                    <div class="col-span-1 md:col-span-3 font-bold text-lg text-sky-800 border-t pt-4">6D Functional Outcomes & Disposition</div>
+                    <div class="form-group"><label class="form-label">6.12 Total Length of Stay (Days)</label><input type="number" name="total_length_of_stay_days" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">6.13 ICU/Stroke Unit LOS (Days)</label><input type="number" name="icu_stroke_unit_los_days" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">6.14 Discharge Disposition</label>
+                        <select name="discharge_disposition" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="home">Home</option><option value="rehabilitation">Rehabilitation</option><option value="refer_other_hospital">Refer to other hospital</option><option value="ama">Against Medical Advice (AMA)</option><option value="death">Death</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">6.15 Discharge NIHSS</label><input type="number" name="discharge_nihss" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label text-red-600">6.16 In-Hospital Mortality</label>
+                        <select name="in_hospital_mortality" class="form-control" onchange="document.getElementById('in_hosp_mort_cause').classList.toggle('hidden', this.value !== 'yes'); updateDraft();">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                        <input type="text" name="in_hospital_mortality_cause" id="in_hosp_mort_cause" class="form-control mt-2 hidden" placeholder="สาเหตุการเสียชีวิต" oninput="updateDraft()">
+                    </div>
+                    <div class="form-group"><label class="form-label text-red-600">6.17 Mortality 30-Day</label>
+                        <select name="mortality_30_day" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option><option value="unknown">Unknown</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">6.18 Discharge mRS</label>
+                        <select name="discharge_mrs" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">6.19 mRS 90-Day</label>
+                        <select name="mrs_90_day" id="mrs_90_day_main" class="form-control bg-blue-50" onchange="calcMRSOutcome()">
+                            <option value="">-- เลือก --</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label text-blue-600 font-bold">6.19 Functional Outcome Group</label><input type="text" id="func_out_grp" name="functional_outcome_group" class="form-control bg-blue-50 font-bold" readonly></div>
+                    
+                    <div class="form-group"><label class="form-label">6.20 TOAST Classification</label>
+                        <select name="toast_classification" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="laa">Large artery atherosclerosis (LAA)</option><option value="cardioembolism">Cardioembolism</option><option value="svd">Small vessel occlusion (SVD)</option><option value="other">Other determined etiology</option><option value="undetermined">Undetermined etiology</option>
+                        </select>
+                    </div>
+                </div>
+            `,
+            sec7: `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group"><label class="form-label">7.1 mRS 90-Day Assessment Method</label>
+                        <select name="mrs_90_day_assessment_method" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="stroke_clinic">Stroke Clinic (OPD)</option><option value="telephone_interview_smrq">Telephone interview (smRSq)</option><option value="proxy_caregiver">Proxy / Caregiver</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">7.1 Assessment 90-Day Date</label><input type="date" name="assessment_90_day_date" class="form-control" onchange="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">7.1 Proxy Relationship</label><input type="text" name="proxy_relationship" class="form-control" oninput="updateDraft()"></div>
+                    
+                    <div class="form-group border-t pt-4 md:col-span-3"><label class="form-label font-bold">Recurrent Stroke</label></div>
+                    <div class="form-group"><label class="form-label">7.2 Recurrent Stroke w/in 90 Days</label>
+                        <select name="recurrent_stroke_within_90_days" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option><option value="unknown">Unknown</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">7.2 Recurrent Stroke Type</label><input type="text" name="recurrent_stroke_type" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">7.2 Recurrent Stroke Date</label><input type="date" name="recurrent_stroke_date" class="form-control" onchange="updateDraft()"></div>
+
+                    <div class="form-group border-t pt-4 md:col-span-3"><label class="form-label font-bold">Rehabilitation</label></div>
+                    <div class="form-group"><label class="form-label">7.3 Rehabilitation Received</label>
+                        <select name="rehabilitation_received" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option><option value="unknown">Unknown</option>
+                        </select>
+                    </div>
+                    <div class="form-group md:col-span-2"><label class="form-label">7.3 Rehabilitation Type (เลือกได้มากกว่า 1)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" name="rehabilitation_type" value="inpatient" onchange="updateDraft()"> Inpatient</label>
+                            <label class="checkbox-item"><input type="checkbox" name="rehabilitation_type" value="opd" onchange="updateDraft()"> OPD</label>
+                            <label class="checkbox-item"><input type="checkbox" name="rehabilitation_type" value="home_based" onchange="updateDraft()"> Home-based</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group border-t pt-4 md:col-span-3"><label class="form-label font-bold">Vital Status / Follow-up</label></div>
+                    <div class="form-group"><label class="form-label text-red-600">7.4 Vital Status</label>
+                        <select name="vital_status" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="alive">Alive</option><option value="dead">Dead</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label text-red-600">7.4 Date of Death</label><input type="date" name="death_date" class="form-control" onchange="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">7.4 Vital Status Source</label>
+                        <select name="vital_status_source" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="clinic">Clinic</option><option value="telephone">Telephone</option><option value="civil_registration">Civil Registration (ทะเบียนราษฎร)</option>
+                        </select>
+                    </div>
+                    <div class="form-group md:col-span-2"><label class="form-label">7.5 Reason Lost to Follow-up</label>
+                        <select name="reason_lost_to_follow_up" class="form-control" onchange="toggleOtherText(this, 'ltfu_other', 'other')">
+                            <option value="">-- เลือก --</option>
+                            <option value="none_complete_follow_up">None (Complete follow up)</option>
+                            <option value="unable_to_contact">Unable to contact</option>
+                            <option value="refused">Refused</option>
+                            <option value="moved_address">Moved address</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <input type="text" name="lost_to_follow_up_other_text" id="ltfu_other" class="form-control mt-2 hidden" placeholder="ระบุเหตุผลอื่นๆ" oninput="updateDraft()">
+                    </div>
+                </div>
+            `,
+            appA: generateNIHSSHTML(),
+            appB: generateAspectsHTML(),
+            verify: `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group"><label class="form-label">Source Data Verified</label>
+                        <select name="source_data_verified" class="form-control" onchange="updateDraft()">
+                            <option value="">-- เลือก --</option><option value="yes">Yes</option><option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group"></div>
+                    
+                    <div class="form-group"><label class="form-label">Data Recorder Name</label><input type="text" name="data_recorder_name" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">Data Recorder Date</label><input type="date" name="data_recorder_date" class="form-control" onchange="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Data Verifier Name</label><input type="text" name="data_verifier_name" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">Data Verifier Date</label><input type="date" name="data_verifier_date" class="form-control" onchange="updateDraft()"></div>
+                    
+                    <div class="form-group"><label class="form-label">Imaging Independent Reviewer Name</label><input type="text" name="imaging_independent_reviewer_name" class="form-control" oninput="updateDraft()"></div>
+                    <div class="form-group"><label class="form-label">Imaging Independent Reviewer Date</label><input type="date" name="imaging_independent_reviewer_date" class="form-control" onchange="updateDraft()"></div>
+                    
+                    <div class="form-group md:col-span-2"><label class="form-label">Final Note / Remarks</label><textarea name="final_note" class="form-control" rows="3" oninput="updateDraft()"></textarea></div>
+                </div>
+            `
+        };
+
+        function generateNIHSSHTML() {
+            const items = [
+                { id: '1a_loc', name: '1a LOC', max: 3 }, { id: '1b_loc_questions', name: '1b LOC Questions', max: 2 },
+                { id: '1c_loc_commands', name: '1c LOC Commands', max: 2 }, { id: '2_best_gaze', name: '2 Best Gaze', max: 2 },
+                { id: '3_visual_fields', name: '3 Visual Fields', max: 3 }, { id: '4_facial_palsy', name: '4 Facial Palsy', max: 3 },
+                { id: '5a_motor_arm_left', name: '5a Motor Arm Left', max: 4 }, { id: '5b_motor_arm_right', name: '5b Motor Arm Right', max: 4 },
+                { id: '6a_motor_leg_left', name: '6a Motor Leg Left', max: 4 }, { id: '6b_motor_leg_right', name: '6b Motor Leg Right', max: 4 },
+                { id: '7_limb_ataxia', name: '7 Limb Ataxia', max: 2 }, { id: '8_sensory', name: '8 Sensory', max: 2 },
+                { id: '9_best_language', name: '9 Best Language', max: 3 }, { id: '10_dysarthria', name: '10 Dysarthria', max: 2 },
+                { id: '11_extinction_inattention', name: '11 Extinction', max: 2 }
+            ];
+            let html = `<div class="overflow-x-auto"><table class="nihss-table w-full text-left mb-4">
+                <thead><tr><th>รายการ (Item)</th><th>Max Score</th><th>Baseline</th><th>24 Hours</th></tr></thead><tbody>`;
+            items.forEach(item => {
+                html += `<tr>
+                    <td>${item.name}</td><td>${item.max}</td>
+                    <td><input type="number" name="nihss_${item.id}_baseline" class="form-control n-base" min="0" max="${item.max}" oninput="calcNIHSS()"></td>
+                    <td><input type="number" name="nihss_${item.id}_24h" class="form-control n-24" min="0" max="${item.max}" oninput="calcNIHSS()"></td>
+                </tr>`;
+            });
+            html += `<tr><td colspan="2" class="font-bold text-right">Total Score</td>
+                <td><input type="number" name="nihss_total_baseline_auto" id="n_tot_base" class="form-control bg-blue-100 font-bold" readonly></td>
+                <td><input type="number" name="nihss_total_24h_auto" id="n_tot_24" class="form-control bg-blue-100 font-bold" readonly></td>
+            </tr></tbody></table></div>`;
+            return html;
+        }
+
+        function generateAspectsHTML() {
+            return `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-blue-800 mb-2 border-b pb-1">Anterior Circulation: ASPECTS</h4>
+                        <p class="text-sm text-gray-500 mb-2">เลือกบริเวณที่พบ early ischemic change (จะหักบริเวณละ 1 คะแนนอัตโนมัติ)</p>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <label><input type="checkbox" name="aspects_c" class="asp-a" value="1" onchange="calcAspects()"> Caudate (C)</label>
+                            <label><input type="checkbox" name="aspects_l" class="asp-a" value="1" onchange="calcAspects()"> Lentiform (L)</label>
+                            <label><input type="checkbox" name="aspects_ic" class="asp-a" value="1" onchange="calcAspects()"> Int. Capsule (IC)</label>
+                            <label><input type="checkbox" name="aspects_i" class="asp-a" value="1" onchange="calcAspects()"> Insular (I)</label>
+                            <label><input type="checkbox" name="aspects_m1" class="asp-a" value="1" onchange="calcAspects()"> M1</label>
+                            <label><input type="checkbox" name="aspects_m2" class="asp-a" value="1" onchange="calcAspects()"> M2</label>
+                            <label><input type="checkbox" name="aspects_m3" class="asp-a" value="1" onchange="calcAspects()"> M3</label>
+                            <label><input type="checkbox" name="aspects_m4" class="asp-a" value="1" onchange="calcAspects()"> M4</label>
+                            <label><input type="checkbox" name="aspects_m5" class="asp-a" value="1" onchange="calcAspects()"> M5</label>
+                            <label><input type="checkbox" name="aspects_m6" class="asp-a" value="1" onchange="calcAspects()"> M6</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold">ASPECTS Auto Score:</span>
+                            <input type="number" name="aspects_auto_score" id="asp_auto" class="form-control w-20 font-bold text-blue-700 bg-gray-100" readonly>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-blue-800 mb-2 border-b pb-1">Posterior Circulation: pc-ASPECTS</h4>
+                        <p class="text-sm text-gray-500 mb-2">เลือกบริเวณที่พบ ischemia (คะแนนหักตามน้ำหนัก)</p>
+                        <div class="grid grid-cols-1 gap-2 mb-4 text-sm">
+                            <div class="font-semibold text-gray-700">หัก 1 คะแนน:</div>
+                            <label><input type="checkbox" name="pc_aspects_thalamus_left" class="asp-p-1" value="1" onchange="calcAspects()"> Thalamus Left</label>
+                            <label><input type="checkbox" name="pc_aspects_thalamus_right" class="asp-p-1" value="1" onchange="calcAspects()"> Thalamus Right</label>
+                            <label><input type="checkbox" name="pc_aspects_cerebellum_left" class="asp-p-1" value="1" onchange="calcAspects()"> Cerebellum Left</label>
+                            <label><input type="checkbox" name="pc_aspects_cerebellum_right" class="asp-p-1" value="1" onchange="calcAspects()"> Cerebellum Right</label>
+                            <label><input type="checkbox" name="pc_aspects_pca_left" class="asp-p-1" value="1" onchange="calcAspects()"> PCA territory Left</label>
+                            <label><input type="checkbox" name="pc_aspects_pca_right" class="asp-p-1" value="1" onchange="calcAspects()"> PCA territory Right</label>
+                            <div class="font-semibold text-gray-700 mt-2">หัก 2 คะแนน:</div>
+                            <label><input type="checkbox" name="pc_aspects_midbrain" class="asp-p-2" value="2" onchange="calcAspects()"> Midbrain</label>
+                            <label><input type="checkbox" name="pc_aspects_pons" class="asp-p-2" value="2" onchange="calcAspects()"> Pons</label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold">pc-ASPECTS Auto Score:</span>
+                            <input type="number" name="pc_aspects_auto_score" id="pc_asp_auto" class="form-control w-20 font-bold text-blue-700 bg-gray-100" readonly>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize Form HTML
+        document.getElementById('sec2').innerHTML = formStructure.sec2;
+        document.getElementById('registryForm').innerHTML += `
+            <div class="section-card"><div class="section-header" onclick="toggleSection('sec3')"><span><i class="fa-solid fa-brain mr-2"></i> Section 3: ลักษณะรอยโรคจากภาพรังสี</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec3"></i></div><div class="section-body" id="sec3">${formStructure.sec3}</div></div>
+            <div class="section-card"><div class="section-header" onclick="toggleSection('sec4')"><span><i class="fa-solid fa-clock mr-2"></i> Section 4: Workflow Time Metrics</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec4"></i></div><div class="section-body" id="sec4">${formStructure.sec4}</div></div>
+            <div class="section-card"><div class="section-header" onclick="toggleSection('sec5')"><span><i class="fa-solid fa-syringe mr-2"></i> Section 5: ข้อมูลการรักษาและหัตถการ</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec5"></i></div><div class="section-body" id="sec5">${formStructure.sec5}</div></div>
+            <div class="section-card"><div class="section-header" onclick="toggleSection('sec6')"><span><i class="fa-solid fa-chart-line mr-2"></i> Section 6: ผลลัพธ์ทางคลินิกภายหลังการรักษา</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec6"></i></div><div class="section-body" id="sec6">${formStructure.sec6}</div></div>
+            <div class="section-card"><div class="section-header" onclick="toggleSection('sec7')"><span><i class="fa-solid fa-calendar-check mr-2"></i> Section 7: ข้อมูลการติดตามที่ 90 วัน</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-sec7"></i></div><div class="section-body" id="sec7">${formStructure.sec7}</div></div>
+            <div class="section-card"><div class="section-header bg-gray-200" onclick="toggleSection('appA')"><span><i class="fa-solid fa-list-ol mr-2"></i> Appendix A: NIHSS Baseline & 24h</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-appA"></i></div><div class="section-body" id="appA">${formStructure.appA}</div></div>
+            <div class="section-card"><div class="section-header bg-gray-200" onclick="toggleSection('appB')"><span><i class="fa-solid fa-x-ray mr-2"></i> Appendix B: ASPECTS / pc-ASPECTS</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-appB"></i></div><div class="section-body" id="appB">${formStructure.appB}</div></div>
+            <div class="section-card"><div class="section-header bg-green-100" onclick="toggleSection('verify')"><span><i class="fa-solid fa-check-double mr-2"></i> Verification Section</span><i class="fa-solid fa-chevron-down transform transition-transform" id="icon-verify"></i></div><div class="section-body" id="verify">${formStructure.verify}</div></div>
+        `;
+
+        // ==========================================
+        // 3. UI Logic & Auto-calculations
+        // ==========================================
+        function toggleSection(id) {
+            const body = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            body.classList.toggle('active');
+            if(body.classList.contains('active')) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function toggleView() {
+            const dashboard = document.getElementById('dashboardView');
+            const form = document.getElementById('formView');
+            const btn = document.getElementById('viewToggleBtn');
+            if (dashboard.style.display === 'none') {
+                dashboard.style.display = 'block';
+                form.style.display = 'none';
+                btn.innerHTML = '<i class="fa-solid fa-pen-to-square mr-1"></i> Form Data';
+                fetchDashboardData();
+            } else {
+                dashboard.style.display = 'none';
+                form.style.display = 'block';
+                btn.innerHTML = '<i class="fa-solid fa-list mr-1"></i> Dashboard';
+            }
+        }
+
+        function toggleOtherText(selectObj, targetId, matchVal) {
+            const target = document.getElementById(targetId);
+            if(selectObj.value.toLowerCase() === matchVal.toLowerCase()) {
+                target.classList.remove('hidden');
+            } else {
+                target.classList.add('hidden');
+                target.value = '';
+            }
+            updateDraft();
+        }
+
+        function toggleDOACWarfarin(selectObj) {
+            const inr = document.getElementById('latest_inr_if_warfarin');
+            const doac = document.getElementById('doac_name');
+            inr.disabled = true; doac.disabled = true;
+            inr.value = ''; doac.value = '';
+            if(selectObj.value === 'warfarin') inr.disabled = false;
+            if(selectObj.value === 'doac') doac.disabled = false;
+            updateDraft();
+        }
+
+        // Calculations
+        function calcBMI() {
+            let w = parseFloat(document.getElementById('weight_kg').value);
+            let h = parseFloat(document.getElementById('height_cm').value);
+            if (w > 0 && h > 0) {
+                let bmi = w / Math.pow(h/100, 2);
+                document.getElementById('bmi_kg_m2').value = bmi.toFixed(2);
+            } else {
+                document.getElementById('bmi_kg_m2').value = '';
+            }
+            updateDraft();
+        }
+
+        function calcGCS() {
+            let e = parseInt(document.getElementById('gcs_eye').value) || 0;
+            let v = parseInt(document.getElementById('gcs_verbal').value) || 0;
+            let m = parseInt(document.getElementById('gcs_motor').value) || 0;
+            if(e>0 && v>0 && m>0) document.getElementById('gcs_total').value = e + v + m;
+            else document.getElementById('gcs_total').value = '';
+            updateDraft();
+        }
+
+        function calcNIHSS() {
+            let sumBase = 0, countBase = 0;
+            document.querySelectorAll('.n-base').forEach(el => {
+                if(el.value !== '') { sumBase += parseInt(el.value); countBase++; }
+            });
+            let sum24 = 0, count24 = 0;
+            document.querySelectorAll('.n-24').forEach(el => {
+                if(el.value !== '') { sum24 += parseInt(el.value); count24++; }
+            });
+            
+            document.getElementById('n_tot_base').value = countBase > 0 ? sumBase : '';
+            document.getElementById('baseline_nihss_total_main').value = countBase > 0 ? sumBase : ''; // sync
+            document.getElementById('n_tot_24').value = count24 > 0 ? sum24 : '';
+            document.getElementById('nihss_24h_total_main').value = count24 > 0 ? sum24 : ''; // sync
+            updateDraft();
+        }
+
+        function calcAspects() {
+            let aspA = 10;
+            document.querySelectorAll('.asp-a:checked').forEach(() => aspA -= 1);
+            document.getElementById('asp_auto').value = aspA;
+            document.getElementById('aspects_score_main').value = aspA;
+
+            let aspP = 10;
+            document.querySelectorAll('.asp-p-1:checked').forEach(() => aspP -= 1);
+            document.querySelectorAll('.asp-p-2:checked').forEach(() => aspP -= 2);
+            document.getElementById('pc_asp_auto').value = aspP;
+            document.getElementById('pc_aspects_score_main').value = aspP;
+            updateDraft();
+        }
+
+        function calcTICI() {
+            const val = document.getElementById('mtici_score_main').value;
+            let succ = 'no', ex = 'no';
+            if(['2b','2c','3'].includes(val)) succ = 'yes';
+            if(['2c','3'].includes(val)) ex = 'yes';
+            document.getElementById('succ_reperf').value = val ? succ : '';
+            document.getElementById('excel_reperf').value = val ? ex : '';
+            updateDraft();
+        }
+
+        function calcMRSOutcome() {
+            const val = document.getElementById('mrs_90_day_main').value;
+            let res = '';
+            if(val !== '') {
+                const num = parseInt(val);
+                if(num >= 0 && num <= 2) res = 'functional_independence_mrs_0_2';
+                else if(num >= 3 && num <= 6) res = 'poor_outcome_mrs_3_6';
+            }
+            document.getElementById('func_out_grp').value = res;
+            updateDraft();
+        }
+
+        function parseDT(d, t) {
+            if(!d || !t) return null;
+            return new Date(`${d}T${t}`);
+        }
+        function diffMinutes(d1, d2) {
+            if(!d1 || !d2) return '';
+            return Math.round((d2 - d1) / 60000);
+        }
+
+        function calcWorkflow() {
+            const dtOn = parseDT(document.getElementById('wf_lkw_d').value, document.getElementById('wf_lkw_t').value);
+            const dtDoor = parseDT(document.getElementById('wf_door_d').value, document.getElementById('wf_door_t').value);
+            const dtImg = parseDT(document.getElementById('wf_img_d').value, document.getElementById('wf_img_t').value);
+            const dtNdl = parseDT(document.getElementById('wf_ndl_d').value, document.getElementById('wf_ndl_t').value);
+            const dtPunc = parseDT(document.getElementById('wf_punc_d').value, document.getElementById('wf_punc_t').value);
+            const dtRep = parseDT(document.getElementById('wf_rep_d').value, document.getElementById('wf_rep_t').value);
+
+            document.getElementById('c_otd').value = diffMinutes(dtOn, dtDoor);
+            document.getElementById('c_dti').value = diffMinutes(dtDoor, dtImg);
+            document.getElementById('c_dtn').value = diffMinutes(dtDoor, dtNdl);
+            document.getElementById('c_dtp').value = diffMinutes(dtDoor, dtPunc);
+            document.getElementById('c_ptr').value = diffMinutes(dtPunc, dtRep);
+            document.getElementById('c_otr').value = diffMinutes(dtOn, dtRep);
+            updateDraft();
+        }
+
+        // ==========================================
+        // 4. Data Management (Draft & Submit)
+        // ==========================================
+        let autoSaveTimer;
+
+        function getFormData() {
+            const form = document.getElementById('registryForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Handle checkboxes (comma separated)
+            const checkboxGroups = {};
+            
+            for (let [key, value] of formData.entries()) {
+                const elements = document.getElementsByName(key);
+                if(elements.length > 0 && elements[0].type === 'checkbox') {
+                    if(!checkboxGroups[key]) checkboxGroups[key] = [];
+                    checkboxGroups[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            for (let key in checkboxGroups) {
+                data[key] = checkboxGroups[key].join(', ');
+            }
+            
+            return data;
+        }
+
+        function fillFormData(data) {
+            const form = document.getElementById('registryForm');
+            for(let key in data) {
+                const elements = document.getElementsByName(key);
+                if(elements.length === 0) continue;
+                
+                const elType = elements[0].type;
+                if(elType === 'checkbox') {
+                    const values = data[key].split(', ');
+                    elements.forEach(el => { el.checked = values.includes(el.value); });
+                } else if(elType === 'radio') {
+                    elements.forEach(el => { if(el.value === data[key]) el.checked = true; });
+                } else {
+                    elements[0].value = data[key];
+                    // Trigger change events for logic
+                    elements[0].dispatchEvent(new Event('change'));
+                }
+            }
+            updateProgress();
+        }
+
+        function updateDraft() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                const data = getFormData();
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+                const now = new Date();
+                document.getElementById('lastSavedText').innerText = `Auto-saved: ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+                updateProgress();
+            }, 1000); // Debounce 1 sec
+        }
+
+        function forceSaveDraft() {
+            const data = getFormData();
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+            Swal.fire({icon: 'success', title: 'บันทึกร่างเรียบร้อย', text: 'ข้อมูลถูกเก็บไว้ในเครื่องของคุณ (Local Storage)', timer: 1500, showConfirmButton: false});
+        }
+
+        function loadDraft() {
+            const saved = localStorage.getItem(DRAFT_KEY);
+            if(saved) {
+                fillFormData(JSON.parse(saved));
+                Swal.fire({icon: 'info', title: 'โหลดข้อมูลร่าง', text: 'เรียกคืนข้อมูลจากครั้งล่าสุดแล้ว', timer: 1500, showConfirmButton: false});
+            } else {
+                Swal.fire({icon: 'warning', title: 'ไม่พบข้อมูลร่าง', text: 'ยังไม่มีการบันทึกข้อมูลไว้ในระบบ', timer: 1500, showConfirmButton: false});
+            }
+        }
+
+        function clearForm() {
+            Swal.fire({
+                title: 'ยืนยันการล้างข้อมูล?', text: "ข้อมูลที่กำลังกรอกจะหายไปทั้งหมด", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'ล้างข้อมูล'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('registryForm').reset();
+                    localStorage.removeItem(DRAFT_KEY);
+                    document.getElementById('lastSavedText').innerText = 'Auto-save: Not yet';
+                    updateProgress();
+                }
+            });
+        }
+
+        function updateProgress() {
+            const form = document.getElementById('registryForm');
+            const inputs = form.querySelectorAll('input:not([type="hidden"]):not([data-skip-progress]), select, textarea');
+            let filled = 0, total = inputs.length;
+            inputs.forEach(el => {
+                if(el.type === 'checkbox' || el.type === 'radio') {
+                    if(el.checked) filled++;
+                } else if(el.value.trim() !== '') {
+                    filled++;
+                }
+            });
+            // Approximate total for checkbox groups
+            const percent = Math.min(100, Math.round((filled / 150) * 100)); // Cap total for UX
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressText').innerText = `ความสมบูรณ์ ~${percent}%`;
+            const heroCompletion = document.getElementById('heroCompletion');
+            if (heroCompletion) heroCompletion.innerText = `${percent}%`;
+            const statusField = document.getElementsByName('record_status')[0];
+            const heroStatus = document.getElementById('heroRecordStatus');
+            if (heroStatus && statusField) heroStatus.innerText = statusField.value || 'Draft';
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').innerText = text || 'กำลังประมวลผล...';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        async function submitToGAS() {
+            const form = document.getElementById('registryForm');
+            if(!form.reportValidity()) {
+                Swal.fire({icon: 'error', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลในช่องที่มีดอกจัน (*) สีแดงให้ครบถ้วน'});
+                return;
+            }
+
+            const data = getFormData();
+            if(!data.created_at) data.created_at = new Date().toISOString();
+            data.updated_at = new Date().toISOString();
+
+            showLoading('กำลังส่งข้อมูลไปยัง Google Sheet...');
+            try {
+                // To avoid CORS issues with simple HTML, we send URL encoded data
+                const params = new URLSearchParams();
+                params.append('action', 'saveRecord');
+                params.append('data', JSON.stringify(data));
+
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                const result = await response.json();
+                hideLoading();
+
+                if(result.status === 'success') {
+                    Swal.fire({icon: 'success', title: 'บันทึกสำเร็จ', text: result.message}).then(() => {
+                        localStorage.removeItem(DRAFT_KEY);
+                        document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud text-green-400 mr-1"></i> Synced';
+                    });
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                hideLoading();
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถบันทึกได้ กรุณาตรวจสอบ Internet หรือ URL ของ Google Apps Script: ' + error.message});
+                document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud-arrow-down text-red-400 mr-1"></i> Failed';
+            }
+        }
+
+        async function fetchDashboardData() {
+            // Placeholder logic if GAS is not yet configured
+            if(GAS_WEB_APP_URL.includes("YOUR_")) {
+                Swal.fire('แจ้งเตือน', 'กรุณาใส่ URL ของ Google Apps Script ในโค้ดก่อนใช้งาน Dashboard', 'warning');
+                return;
+            }
+            showLoading('กำลังโหลดข้อมูล...');
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getStats`);
+                const result = await response.json();
+                if(result.status === 'success') {
+                    document.getElementById('statTotal').innerText = result.data.total;
+                    document.getElementById('statSuccessReperf').innerText = result.data.successful_reperfusion;
+                    document.getElementById('statGoodOut').innerText = result.data.good_outcome;
+                    document.getElementById('statDeath').innerText = result.data.mortality;
+                }
+            } catch(e) {
+                console.error("Dashboard error", e);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function searchData() {
+            const searchId = document.getElementById('searchInput').value;
+            if(!searchId) return;
+            
+            showLoading('กำลังค้นหา...');
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getRecord&study_id=${encodeURIComponent(searchId)}`);
+                const result = await response.json();
+                hideLoading();
+                
+                if(result.status === 'success' && result.data) {
+                    toggleView(); // Go back to form view
+                    fillFormData(result.data);
+                    Swal.fire('พบข้อมูล', `โหลดข้อมูลของ ${searchId} เรียบร้อยแล้ว`, 'success');
+                } else {
+                    Swal.fire('ไม่พบข้อมูล', 'ไม่มี Study ID นี้ในระบบ', 'warning');
+                }
+            } catch(e) {
+                hideLoading();
+                Swal.fire('ข้อผิดพลาด', 'เกิดปัญหาในการค้นหา', 'error');
+            }
+        }
+
+        function exportCSV() {
+            window.open(`${GAS_WEB_APP_URL}?action=exportCSV`, '_blank');
+        }
+
+        // Initialize
+        window.onload = () => {
+            if(localStorage.getItem(DRAFT_KEY)) {
+                Swal.fire({
+                    title: 'พบข้อมูลร่างที่ยังไม่บันทึก', text: "ต้องการโหลดข้อมูลร่างนี้หรือไม่?", icon: 'question',
+                    showCancelButton: true, confirmButtonText: 'โหลด', cancelButtonText: 'เริ่มใหม่'
+                }).then((result) => {
+                    if (result.isConfirmed) loadDraft();
+                    else localStorage.removeItem(DRAFT_KEY);
+                });
+            }
+            // Bind input events to update calculations and drafts dynamically
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.addEventListener('change', updateDraft);
+            });
+        };
+        // ==========================================
+        // 5. Enhanced dashboard, editing workflow, and no-local-draft mode
+        // ==========================================
+        var dashboardState = {
+            headers: [],
+            records: [],
+            filtered: []
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function normalizeDateForInput(value) {
+            if (!value) return '';
+            const text = String(value);
+            if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+            if (/^\d{4}-\d{2}-\d{2}T/.test(text)) return text.slice(0, 10);
+            const parsed = new Date(text);
+            if (!Number.isNaN(parsed.getTime())) {
+                const y = parsed.getFullYear();
+                const m = String(parsed.getMonth() + 1).padStart(2, '0');
+                const d = String(parsed.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            return text;
+        }
+
+        function normalizeTimeForInput(value) {
+            if (!value) return '';
+            const text = String(value);
+            const simpleTime = text.match(/^(\d{2}):(\d{2})/);
+            if (simpleTime) return `${simpleTime[1]}:${simpleTime[2]}`;
+            const parsed = new Date(text);
+            if (!Number.isNaN(parsed.getTime())) {
+                return `${String(parsed.getHours()).padStart(2, '0')}:${String(parsed.getMinutes()).padStart(2, '0')}`;
+            }
+            return text;
+        }
+
+        function isFilled(value) {
+            return value !== undefined && value !== null && String(value).trim() !== '';
+        }
+
+        function toNumber(value) {
+            if (!isFilled(value)) return null;
+            const num = Number(String(value).replace(/,/g, ''));
+            return Number.isFinite(num) ? num : null;
+        }
+
+        function median(values) {
+            const nums = values.map(toNumber).filter(v => v !== null).sort((a, b) => a - b);
+            if (!nums.length) return null;
+            const mid = Math.floor(nums.length / 2);
+            return nums.length % 2 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+        }
+
+        function mean(values) {
+            const nums = values.map(toNumber).filter(v => v !== null);
+            if (!nums.length) return null;
+            return nums.reduce((sum, n) => sum + n, 0) / nums.length;
+        }
+
+        function formatNumber(value, decimals = 1) {
+            if (value === null || value === undefined || Number.isNaN(value)) return '-';
+            return Number(value).toLocaleString('en-US', { maximumFractionDigits: decimals });
+        }
+
+        function percent(count, total) {
+            if (!total) return '0%';
+            return `${Math.round((count / total) * 100)}%`;
+        }
+
+        function firstAvailable(record, fields) {
+            for (const field of fields) {
+                if (isFilled(record[field])) return record[field];
+            }
+            return '';
+        }
+
+        function initializeUiText() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.placeholder = 'ค้นหาด้วย Study ID หรือคำในตาราง...';
+                searchInput.addEventListener('input', filterDashboardTable);
+            }
+
+            document.querySelectorAll('button[onclick="submitToGAS()"]').forEach(btn => {
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1"></i> บันทึกข้อมูล';
+            });
+
+            const clearBtn = document.querySelector('button[onclick="clearForm()"]');
+            if (clearBtn) clearBtn.innerHTML = '<i class="fa-solid fa-eraser mr-1"></i> ล้างข้อมูล';
+
+            const footer = document.getElementById('lastSavedText');
+            if (footer) footer.innerText = 'พร้อมบันทึกข้อมูล';
+            const heroLastSaved = document.getElementById('heroLastSaved');
+            if (heroLastSaved) heroLastSaved.innerText = 'พร้อมบันทึกข้อมูล';
+
+            document.querySelectorAll('#dashboardView .bg-blue-600').forEach(btn => {
+                btn.className = 'btn btn-primary';
+                btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> ค้นหา';
+            });
+            document.querySelectorAll('#dashboardView .bg-green-600').forEach(btn => {
+                btn.className = 'btn btn-amber';
+            });
+            const searchRow = document.querySelector('#dashboardView .flex.gap-2');
+            if (searchRow) searchRow.className = 'grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] gap-3';
+        }
+
+        function showFormView() {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('formView').style.display = 'block';
+            document.getElementById('viewToggleBtn').innerHTML = '<i class="fa-solid fa-table-columns"></i> Dashboard';
+        }
+
+        function showDashboardView() {
+            document.getElementById('dashboardView').style.display = 'block';
+            document.getElementById('formView').style.display = 'none';
+            document.getElementById('viewToggleBtn').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> แบบฟอร์ม';
+            fetchDashboardData();
+        }
+
+        function toggleView() {
+            const dashboard = document.getElementById('dashboardView');
+            if (dashboard.style.display === 'none' || !dashboard.style.display) showDashboardView();
+            else showFormView();
+        }
+
+        function updateDraft() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                updateProgress();
+                const now = new Date();
+                const label = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                document.getElementById('lastSavedText').innerText = `แก้ไขล่าสุด ${label}`;
+                const heroLastSaved = document.getElementById('heroLastSaved');
+                if (heroLastSaved) heroLastSaved.innerText = `แก้ไขล่าสุด ${label}`;
+            }, 250);
+        }
+
+        function forceSaveDraft() {
+            updateProgress();
+        }
+
+        function loadDraft() {
+            Swal.fire({icon: 'info', title: 'ปิดการใช้ Draft แล้ว', text: 'ให้บันทึกข้อมูลลงระบบด้วยปุ่ม “บันทึกข้อมูล”'});
+        }
+
+        function resetOptionalControls() {
+            [
+                'health_insurance_other_text',
+                'vascular_access_other_text',
+                'rescue_therapy_other_text',
+                'procedural_complications_other_text',
+                'sys_comp_other',
+                'in_hosp_mort_cause',
+                'ltfu_other'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            const inr = document.getElementById('latest_inr_if_warfarin');
+            const doac = document.getElementById('doac_name');
+            if (inr) inr.disabled = true;
+            if (doac) doac.disabled = true;
+        }
+
+        function resetFormState() {
+            const form = document.getElementById('registryForm');
+            form.reset();
+            localStorage.removeItem(DRAFT_KEY);
+            resetOptionalControls();
+            document.getElementById('created_at').value = '';
+            document.getElementById('updated_at').value = '';
+            document.getElementById('lastSavedText').innerText = 'พร้อมบันทึกข้อมูล';
+            const heroLastSaved = document.getElementById('heroLastSaved');
+            if (heroLastSaved) heroLastSaved.innerText = 'พร้อมบันทึกข้อมูล';
+            document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud text-emerald-300 mr-1"></i> Ready';
+            document.querySelectorAll('.section-body').forEach(body => body.classList.remove('active'));
+            document.querySelectorAll('[id^="icon-"]').forEach(icon => icon.style.transform = 'rotate(0deg)');
+            document.getElementById('sec0').classList.add('active');
+            const icon = document.getElementById('icon-sec0');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+            updateProgress();
+        }
+
+        function startNewRecord() {
+            resetFormState();
+            showFormView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearForm() {
+            Swal.fire({
+                title: 'ยืนยันการล้างข้อมูล?',
+                text: 'ข้อมูลที่กำลังกรอกจะถูกล้างออกจากแบบฟอร์ม',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#b91c1c',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'ล้างข้อมูล',
+                cancelButtonText: 'ยกเลิก'
+            }).then(result => {
+                if (result.isConfirmed) resetFormState();
+            });
+        }
+
+        function fillFormData(data) {
+            resetFormState();
+            Object.keys(data || {}).forEach(key => {
+                const elements = document.getElementsByName(key);
+                if (!elements.length) return;
+
+                const value = data[key];
+                const first = elements[0];
+                if (first.type === 'checkbox') {
+                    const values = String(value || '').split(',').map(v => v.trim());
+                    elements.forEach(el => { el.checked = values.includes(el.value); });
+                } else if (first.type === 'radio') {
+                    elements.forEach(el => { el.checked = el.value === String(value); });
+                } else {
+                    if (first.type === 'date') first.value = normalizeDateForInput(value);
+                    else if (first.type === 'time') first.value = normalizeTimeForInput(value);
+                    else first.value = value ?? '';
+                    first.dispatchEvent(new Event('change'));
+                }
+            });
+            syncConditionalFieldsAfterFill();
+            updateProgress();
+        }
+
+        function syncConditionalFieldsAfterFill() {
+            const showIfChecked = (name, value, targetId) => {
+                const checked = Array.from(document.getElementsByName(name)).some(el => el.value === value && el.checked);
+                const target = document.getElementById(targetId);
+                if (target) target.classList.toggle('hidden', !checked);
+            };
+
+            showIfChecked('rescue_therapy', 'other', 'rescue_therapy_other_text');
+            showIfChecked('procedural_complications', 'other', 'procedural_complications_other_text');
+            showIfChecked('systemic_complications', 'other', 'sys_comp_other');
+
+            const mortality = document.getElementsByName('in_hospital_mortality')[0];
+            const mortalityCause = document.getElementById('in_hosp_mort_cause');
+            if (mortality && mortalityCause) mortalityCause.classList.toggle('hidden', mortality.value !== 'yes');
+        }
+
+        function loadRecordForEdit(index) {
+            const record = dashboardState.filtered[index];
+            if (!record) return;
+            fillFormData(record);
+            const studyId = record.study_id || '';
+            document.getElementById('syncStatus').innerHTML = `<i class="fa-solid fa-pen text-amber-200 mr-1"></i> Editing ${escapeHtml(studyId)}`;
+            showFormView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            Swal.fire({icon: 'success', title: 'โหลดข้อมูลแล้ว', text: `Study ID: ${studyId}`, timer: 1400, showConfirmButton: false});
+        }
+
+        function renderMetricCard(label, value, subText) {
+            return `
+                <div class="metric-card">
+                    <div class="metric-label">${escapeHtml(label)}</div>
+                    <div class="metric-value">${escapeHtml(value)}</div>
+                    <div class="metric-sub">${escapeHtml(subText)}</div>
+                </div>
+            `;
+        }
+
+        function renderDashboardSummaries(records, stats = {}) {
+            const total = records.length;
+            const success = stats.successful_reperfusion ?? records.filter(r => String(r.successful_reperfusion_mtici_2b_or_more).toLowerCase() === 'yes').length;
+            const goodOutcome = stats.good_outcome ?? records.filter(r => String(r.functional_outcome_group).includes('0_2')).length;
+            const mortality = stats.mortality ?? records.filter(r => String(r.in_hospital_mortality).toLowerCase() === 'yes').length;
+
+            const baselineNihss = median(records.map(r => firstAvailable(r, ['baseline_nihss_total', 'nihss_total_baseline_auto'])));
+            const doorToPuncture = median(records.map(r => r.door_to_puncture_minutes));
+            const ageMean = mean(records.map(r => r.age_at_stroke_years));
+            const aspectsMedian = median(records.map(r => firstAvailable(r, ['aspects_score', 'aspects_auto_score'])));
+            const sich = records.filter(r => String(r.sich_ecass_ii).toLowerCase() === 'yes').length;
+            const excellent = records.filter(r => String(r.excellent_reperfusion_mtici_2c_or_3).toLowerCase() === 'yes').length;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statSuccessReperf').innerText = success;
+            document.getElementById('statGoodOut').innerText = goodOutcome;
+            document.getElementById('statDeath').innerText = mortality;
+
+            const grid = document.getElementById('dashboardSummaryGrid');
+            if (grid) {
+                grid.innerHTML = [
+                    renderMetricCard('Successful Reperfusion', percent(success, total), `${success}/${total} records`),
+                    renderMetricCard('Functional Independence', percent(goodOutcome, total), 'mRS 0-2 at 90 days'),
+                    renderMetricCard('Mortality', percent(mortality, total), `${mortality}/${total} records`),
+                    renderMetricCard('Mean Age', formatNumber(ageMean), 'years'),
+                    renderMetricCard('Median NIHSS', formatNumber(baselineNihss), 'baseline'),
+                    renderMetricCard('Median ASPECTS', formatNumber(aspectsMedian), 'anterior score'),
+                    renderMetricCard('Median Door-Puncture', formatNumber(doorToPuncture), 'minutes'),
+                    renderMetricCard('Excellent Reperfusion', percent(excellent, total), `sICH ${percent(sich, total)}`)
+                ].join('');
+            }
+        }
+
+        function summarizeVariable(header, records) {
+            const values = records.map(r => r[header]).filter(isFilled);
+            const filled = values.length;
+            if (!filled) return { filled, summary: '-' };
+
+            const numericValues = values.map(toNumber).filter(v => v !== null);
+            if (numericValues.length >= Math.max(1, Math.round(values.length * 0.8))) {
+                return {
+                    filled,
+                    summary: `median ${formatNumber(median(values))}, mean ${formatNumber(mean(values))}`
+                };
+            }
+
+            const counts = {};
+            values.forEach(value => {
+                const key = String(value);
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+            return {
+                filled,
+                summary: `${top[0]} (${top[1]})`
+            };
+        }
+
+        function renderVariableSummary(headers, records) {
+            const container = document.getElementById('dashboardVariableSummaryContainer');
+            if (!container || !headers.length || !records.length) {
+                if (container) container.innerHTML = '';
+                return;
+            }
+
+            const rows = headers.map(header => {
+                const summary = summarizeVariable(header, records);
+                return `
+                    <tr>
+                        <td class="font-semibold">${escapeHtml(header)}</td>
+                        <td>${summary.filled}/${records.length} (${percent(summary.filled, records.length)})</td>
+                        <td>${escapeHtml(summary.summary)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <details class="dashboard-panel p-3" open>
+                    <summary class="cursor-pointer font-bold text-slate-700">สรุปตัวแปรทั้งหมด</summary>
+                    <div class="data-table-wrap mt-3" style="max-height: 280px;">
+                        <table class="data-table">
+                            <thead><tr><th>Variable</th><th>Completeness</th><th>Summary</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </details>
+            `;
+        }
+
+        function renderDashboardTable() {
+            const container = document.getElementById('dashboardTableContainer');
+            const countLabel = document.getElementById('dashboardRecordCount');
+            const headers = dashboardState.headers.length ? dashboardState.headers : Object.keys(dashboardState.records[0] || {});
+            const records = dashboardState.filtered;
+
+            if (countLabel) countLabel.innerText = `${records.length} of ${dashboardState.records.length} records`;
+            if (!container) return;
+
+            if (!records.length) {
+                container.className = 'empty-state';
+                container.innerText = 'ยังไม่มีข้อมูลสำหรับแสดงผล';
+                return;
+            }
+
+            const tableHeaders = headers.map(h => `<th>${escapeHtml(h)}</th>`).join('');
+            const rows = records.map((record, index) => {
+                const cells = headers.map(header => {
+                    const value = record[header] ?? '';
+                    return `<td title="${escapeHtml(value)}">${escapeHtml(value)}</td>`;
+                }).join('');
+                return `
+                    <tr>
+                        <td class="sticky-col">
+                            <button type="button" onclick="loadRecordForEdit(${index})" class="btn btn-secondary py-1 px-2 text-xs">
+                                <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+                            </button>
+                        </td>
+                        ${cells}
+                    </tr>
+                `;
+            }).join('');
+
+            container.className = 'data-table-wrap';
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead><tr><th class="sticky-col">Action</th>${tableHeaders}</tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        }
+
+        function filterDashboardTable() {
+            const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+            if (!query) dashboardState.filtered = dashboardState.records.slice();
+            else {
+                dashboardState.filtered = dashboardState.records.filter(record => {
+                    return Object.values(record).some(value => String(value ?? '').toLowerCase().includes(query));
+                });
+            }
+            renderDashboardTable();
+        }
+
+        async function fetchDashboardData() {
+            if (GAS_WEB_APP_URL.includes('YOUR_')) {
+                Swal.fire('แจ้งเตือน', 'กรุณาใส่ URL ของ Google Apps Script ก่อนใช้งาน Dashboard', 'warning');
+                return;
+            }
+
+            showLoading('กำลังโหลดข้อมูล Dashboard...');
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getRecords`);
+                const result = await response.json();
+                if (result.status !== 'success') throw new Error(result.message || 'Cannot load records');
+
+                dashboardState.headers = result.headers || [];
+                dashboardState.records = result.records || [];
+                dashboardState.filtered = dashboardState.records.slice();
+
+                renderDashboardSummaries(dashboardState.records, result.stats || {});
+                renderVariableSummary(dashboardState.headers, dashboardState.records);
+                filterDashboardTable();
+            } catch (error) {
+                console.error(error);
+                Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถโหลด Dashboard ได้: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function searchData() {
+            const searchId = (document.getElementById('searchInput')?.value || '').trim();
+            if (!searchId) {
+                filterDashboardTable();
+                return;
+            }
+
+            const exactIndex = dashboardState.filtered.findIndex(record => String(record.study_id || '').trim() === searchId);
+            if (exactIndex >= 0) {
+                loadRecordForEdit(exactIndex);
+                return;
+            }
+
+            showLoading('กำลังค้นหาข้อมูล...');
+            try {
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getRecord&study_id=${encodeURIComponent(searchId)}`);
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    fillFormData(result.data);
+                    showFormView();
+                    Swal.fire('พบข้อมูล', `โหลดข้อมูลของ ${searchId} แล้ว`, 'success');
+                } else {
+                    Swal.fire('ไม่พบข้อมูล', 'ไม่มี Study ID นี้ในระบบ', 'warning');
+                }
+            } catch(error) {
+                Swal.fire('เกิดข้อผิดพลาด', 'เกิดปัญหาในการค้นหา', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function submitToGAS() {
+            const form = document.getElementById('registryForm');
+            if (!form.reportValidity()) {
+                Swal.fire({icon: 'error', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกช่องที่จำเป็นให้ครบถ้วน'});
+                return;
+            }
+            const invalidThaiDate = form.querySelector('.thai-date-display.is-invalid');
+            if (invalidThaiDate) {
+                invalidThaiDate.focus();
+                Swal.fire({icon: 'error', title: 'รูปแบบวันที่ไม่ถูกต้อง', text: 'กรุณากรอกวันที่เป็นรูปแบบ วันที่/เดือน/พ.ศ. เช่น 08/06/2569'});
+                return;
+            }
+
+            const data = getFormData();
+            if (!data.created_at) data.created_at = new Date().toISOString();
+            data.updated_at = new Date().toISOString();
+            if (!data.record_status || data.record_status === 'Draft') data.record_status = 'Submitted';
+
+            showLoading('กำลังบันทึกข้อมูล...');
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'saveRecord');
+                params.append('data', JSON.stringify(data));
+
+                const response = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: params });
+                const result = await response.json();
+                if (result.status !== 'success') throw new Error(result.message);
+
+                document.getElementById('created_at').value = data.created_at;
+                document.getElementById('updated_at').value = data.updated_at;
+                const recordStatus = document.getElementsByName('record_status')[0];
+                if (recordStatus && recordStatus.value === 'Draft') recordStatus.value = 'Submitted';
+                localStorage.removeItem(DRAFT_KEY);
+                document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud text-emerald-300 mr-1"></i> Synced';
+                document.getElementById('lastSavedText').innerText = 'บันทึกข้อมูลแล้ว';
+                const heroLastSaved = document.getElementById('heroLastSaved');
+                if (heroLastSaved) heroLastSaved.innerText = 'บันทึกข้อมูลแล้ว';
+
+                Swal.fire({icon: 'success', title: 'บันทึกข้อมูลสำเร็จ', text: result.message || `Study ID: ${data.study_id}`});
+                fetchDashboardData();
+            } catch (error) {
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: `ไม่สามารถบันทึกข้อมูลได้: ${error.message}`});
+                document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud-arrow-down text-red-200 mr-1"></i> Failed';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function formatThaiDate(isoValue) {
+            if (!isoValue) return '';
+            const normalized = normalizeDateForInput(isoValue);
+            const match = String(normalized).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!match) return String(isoValue);
+            const buddhistYear = Number(match[1]) + 543;
+            return `${match[3]}/${match[2]}/${buddhistYear}`;
+        }
+
+        function parseThaiDate(displayValue) {
+            const text = String(displayValue || '').trim();
+            if (!text) return '';
+
+            const match = text.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+            if (!match) return null;
+
+            const day = Number(match[1]);
+            const month = Number(match[2]);
+            let year = Number(match[3]);
+            if (year > 2400) year -= 543;
+
+            const date = new Date(year, month - 1, day);
+            if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day
+            ) {
+                return null;
+            }
+
+            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function syncThaiDateDisplays() {
+            document.querySelectorAll('input[data-thai-date-source="true"]').forEach(source => {
+                const display = source.previousElementSibling;
+                if (display && display.dataset.thaiDateDisplay === 'true') {
+                    display.value = formatThaiDate(source.value);
+                    display.classList.remove('is-invalid');
+                }
+            });
+        }
+
+        function enhanceThaiDateInputs() {
+            document.querySelectorAll('input[type="date"]:not([data-thai-date-source])').forEach(source => {
+                const display = document.createElement('input');
+                display.type = 'text';
+                display.className = `${source.className} thai-date-display`;
+                display.placeholder = 'วันที่/เดือน/พ.ศ.';
+                display.inputMode = 'numeric';
+                display.autocomplete = 'off';
+                display.dataset.skipProgress = 'true';
+                display.dataset.thaiDateDisplay = 'true';
+                display.value = formatThaiDate(source.value);
+
+                source.dataset.thaiDateSource = 'true';
+                source.classList.add('thai-date-source');
+                source.tabIndex = -1;
+                source.setAttribute('aria-hidden', 'true');
+
+                display.addEventListener('input', () => {
+                    const iso = parseThaiDate(display.value);
+                    if (iso === null) {
+                        display.classList.add('is-invalid');
+                        source.value = '';
+                        source.dispatchEvent(new Event('input', { bubbles: true }));
+                        return;
+                    }
+                    display.classList.remove('is-invalid');
+                    source.value = iso;
+                    source.dispatchEvent(new Event('input', { bubbles: true }));
+                    source.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+
+                display.addEventListener('blur', () => {
+                    const iso = parseThaiDate(display.value);
+                    if (iso) display.value = formatThaiDate(iso);
+                });
+
+                source.addEventListener('change', () => {
+                    display.value = formatThaiDate(source.value);
+                    display.classList.remove('is-invalid');
+                });
+
+                source.parentNode.insertBefore(display, source);
+            });
+        }
+
+        function initializeRegistryApp() {
+            localStorage.removeItem(DRAFT_KEY);
+            enhanceThaiDateInputs();
+            syncThaiDateDisplays();
+            initializeUiText();
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.addEventListener('change', updateDraft);
+                el.addEventListener('input', updateDraft);
+            });
+            resetOptionalControls();
+            updateProgress();
+        }
+
+        window.onload = initializeRegistryApp;
+    </script>
+</body>
+</html>
